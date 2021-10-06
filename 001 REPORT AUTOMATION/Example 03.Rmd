@@ -1,25 +1,12 @@
 ---
 output: 
   word_document:
-   reference_docx: Boletin_ref_Metro.docx
+   reference_docx: Reference_docx.docx
 params:
-  reg: 13           ## región para la cual se construye el boletín
+  reg: 17           ## Region (17 = National)
   year: 2021
-  month: 7          ## mes actual o mes del cual se desean ver los datos principales del boletín
+  month: 7
 ---
-
-```{r, include=FALSE}
-reg <- params$reg
-year <- params$year
-month <- params$month
-outp <- params$output
-user <- params$user
-```
-
-```{r, include=FALSE}
-mes <- c(paste0('0',1:9),paste0(10:12))
-trim <- c("DEF","EFM","FMA","MAM","AMJ","MJJ","JJA","JAS","ASO","SON","OND","NDE")
-```
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE,dpi=300)
@@ -33,9 +20,21 @@ source('Scripts for bulletin/01 Packages.R')
 source('Scripts for bulletin/02 Base manipulation.R')
 ```
 
+```{r, include=FALSE}
+source('Scripts for bulletin/03 Plots.R')
+```
+
 ---
-title: "Boletín Laboral CEPR"
-author: "Región Metropolitana `r trim[params$month]`-`r year`"
+title: "Labor Bulletin"
+subtitle: "Center for Regional Economics and Politics (CEPR)"
+author: "`r region[params$reg]` `r trim[params$month]`-`r params$year`"
 date: `r format(Sys.Date(), "%d/%m/%Y")`
 ---
+
+#### Number of workers per trimester
+
+```{r, fig.height=5,fig.width=10}
+Plot01
+```
+
 
