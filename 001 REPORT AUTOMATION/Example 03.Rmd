@@ -37,4 +37,16 @@ date: `r format(Sys.Date(), "%d/%m/%Y")`
 Plot01
 ```
 
+Aquí va texto:
+
+* Texto n°1.
+
+* Texto n°2.
+
+
+#### Labormarket descomposition
+
+```{r, fig.height=5,fig.width=10}
+flextable01
+```
 
