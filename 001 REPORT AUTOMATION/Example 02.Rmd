@@ -1,7 +1,60 @@
 ---
-title: "Untitled"
-author: "Martín Sielfeld"
-date: "06-10-2021"
-output: html_document
+output: 
+  word_document:
+   reference_docx: Reference_docx.docx
+params:
+  reg: 17           ## Region (17 = National)
+  year: 2021
+  month: 7
 ---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE,dpi=300)
+```
+
+```{r, include=FALSE}
+source('Scripts for bulletin/01 Packages.R')
+```
+
+```{r, include=FALSE}
+source('Scripts for bulletin/02 Base manipulation.R')
+```
+
+```{r, include=FALSE}
+source('Scripts for bulletin/03 Plots.R')
+```
+
+```{r, include=FALSE}
+source('Scripts for bulletin/04 Text.R')
+```
+
+---
+title: "Labor Bulletin"
+subtitle: "Center for Regional Economics and Politics (CEPR)"
+author: "`r region[params$reg]` `r trim[params$month]`-`r params$year`"
+date: `r format(Sys.Date(), "%d/%m/%Y")`
+---
+
+#### Number of workers per trimester
+
+```{r, fig.height=5,fig.width=10}
+Plot01
+```
+
+The results from trimester `r trim[params$month]`-`r params$year` show that:
+
+* There are `r comma(a)` workers, **`r comma(a-b)` `r ab` than `r trim[params$month]`-`r params$year-1`** and `r comma(a-c)` `r ac` than `r trim[cm]`-`r cy`.
+
+* **The unemployment rate was `r percent(d,accuracy = 0.01)`, which is `r percent(abs(d-e),accuracy = 0.01,suffix = 'pp.')` `r de` than one year before.** The participation rate was `r percent(f,accuracy = 0.01)`, which is `r percent(abs(f-g),accuracy = 0.01,suffix = 'pp.')` `r de` than same trimester last year.
+
+* Here you can add more text. You can write something more specific related to the context of the past trimester.
+
+#### Labormarket decomposition
+
+```{r, fig.height=5,fig.width=10}
+flextable01
+```
+
+You can add more analysis here. The idea is to explain, for each plot and table, some useful information related to the analyzed topic. Too much text in one page is not attractive for the reader, so try to mix text and plots/tables.
+
 
