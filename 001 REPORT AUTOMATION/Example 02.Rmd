@@ -38,21 +38,21 @@ date: `r format(Sys.Date(), "%d/%m/%Y")`
 #### Number of workers per trimester
 
 ```{r, fig.height=5,fig.width=10}
-Plot01
+Plot01 ## This is a ggplot object
 ```
 
 The results from trimester `r trim[params$month]`-`r params$year` show that:
 
 * There are `r comma(a)` workers, **`r comma(a-b)` `r ab` than `r trim[params$month]`-`r params$year-1`** and `r comma(a-c)` `r ac` than `r trim[cm]`-`r cy`.
 
-* **The unemployment rate was `r percent(d,accuracy = 0.01)`, which is `r percent(abs(d-e),accuracy = 0.01,suffix = 'pp.')` `r de` than one year before.** The participation rate was `r percent(f,accuracy = 0.01)`, which is `r percent(abs(f-g),accuracy = 0.01,suffix = 'pp.')` `r de` than same trimester last year.
+* **The unemployment rate is `r percent(d,accuracy = 0.01)`, which is `r percent(abs(d-e),accuracy = 0.01,suffix = 'pp.')` `r de` than one year before.** The participation rate was `r percent(f,accuracy = 0.01)`, which is `r percent(abs(f-g),accuracy = 0.01,suffix = 'pp.')` `r de` than same trimester last year.
 
 * Here you can add more text. You can write something more specific related to the context of the past trimester.
 
 #### Labormarket decomposition
 
 ```{r, fig.height=5,fig.width=10}
-flextable01
+flextable01 ## This is a flextable object
 ```
 
 You can add more analysis here. The idea is to explain, for each plot and table, some useful information related to the analyzed topic. Too much text in one page is not attractive for the reader, so try to mix text and plots/tables.

@@ -1,7 +1,148 @@
 ---
-title: "Untitled"
-author: "Martín Sielfeld"
-date: "06-10-2021"
-output: html_document
+output: 
+  word_document:
+   reference_docx: Reference_docx.docx
+title: "Labor Bulletin"
+subtitle: "Center for Regional Economics and Politics (CEPR)"
+author: "National JJA-2021"
+date: "13/10/2021"
 ---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE,dpi=300)
+```
+
+```{r, include=FALSE}
+pack <- c('data.table','dplyr','ggplot2','scales','flextable','officer','lubridate')
+install.packages(setdiff(pack, rownames(installed.packages())))
+sapply(pack,require,character.only=TRUE)
+```
+
+```{r, include=FALSE}
+## Limpiamos todo:
+options(scipen=999)
+
+## Creamos objetos para graficos base:
+Table01 <- NULL
+
+## For loop:
+mes <- c(paste0('0',1:9),paste0(10:12))
+trim <- c("DEF","EFM","FMA","MAM","AMJ","MJJ","JJA","JAS","ASO","SON","OND","NDE")
+region <- c('Tarapaca Region','Antofagasta Region','Atacama Region','Coquimbo Region',
+            'Valparaiso Region',"O'Higgins Region",'Maule Region','Bio Bio Region',
+            'La Araucania Region','Los Lagos Region','Aysen Region',
+            'Magallanes Region','Metropolitan Region','Los Rios Region',
+            'Arica y Parinacota Region','Nuble Region','National')
+
+## Loop for collapsing data:
+for(i in 2019:2021){
+  for(j in 1:12){
+    if (as.Date('2021-07-01') < as.Date(paste0(i,'-',j,'-01'))){
+      break
+    }
+    print(paste0('We are in: ',i," ",trim[j]))
+    base <- fread(paste0('Labor data/',i,'/ene-',i,'-',mes[j],'.csv'),stringsAsFactors = F)
+    
+    b1 <- base[edad >= 15, .(Total = sum(fact_cal,na.rm = T)), 
+               by=.(ano_trimestre,mes_central,region,edad,cae_general)]
+    Table01 <- rbind(Table01,b1)
+    
+    rm(base,b1)
+  }
+}
+```
+
+```{r, include=FALSE}
+data01 <- Table01[cae_general %in% c(1:3),.(Total=sum(Total,na.rm=T)),
+                    by=.(ano_trimestre,mes_central)] 
+
+data01[,trimester := factor(mes_central,levels = 1:12, labels = trim)]
+data01[,date := as.Date(paste0(ano_trimestre,'-',mes_central,'-01'))]
+
+Plot01 <-
+ggplot(data01,aes(x=trimester,y=Total,group=factor(ano_trimestre),color=factor(ano_trimestre))) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(x=NULL,y=NULL,color=NULL) +
+  theme(legend.position = 'bottom') +
+  scale_y_continuous(labels = number_format(scale = 0.001,suffix = 'K'))
+```
+
+```{r, include=FALSE}
+Table01[edad %in% c(15:29), Age := "15 - 29"]
+Table01[edad %in% c(30:44), Age := "30 - 44"]
+Table01[edad %in% c(45:59), Age := "45 - 59"]
+Table01[edad >= 60, Age := "60 or more"]
+
+Table01[cae_general %in% c(1:3), cae_general_red := 'Employed']
+Table01[cae_general %in% c(4:5), cae_general_red := 'Unemployed']
+Table01[cae_general %in% c(6:9), cae_general_red := 'Inactive']
+
+data02 <- Table01[!is.na(Age) & mes_central == 7 & ano_trimestre >=2021-1,
+                  .(Total=sum(Total,na.rm=T)),by=.(ano_trimestre,Age,cae_general_red)]
+data03 <- Table01[!is.na(Age) & mes_central == 7 &ano_trimestre >= 2021-1,
+                  .(Total=sum(Total,na.rm=T)),by=.(ano_trimestre,cae_general_red)] 
+
+data02[,cae_general_red := factor(cae_general_red,levels = c('Employed','Unemployed','Inactive'))]
+data03[,cae_general_red := factor(cae_general_red,levels = c('Employed','Unemployed','Inactive'))]
+
+data02 <- dcast.data.table(data02,Age ~ cae_general_red + ano_trimestre, value.var = 'Total',fill=0)
+data03 <- dcast.data.table(data03,''~ cae_general_red + ano_trimestre, value.var = 'Total')[,2:7]
+
+data04 <- rbind(data02,data03,fill=T)
+data04[is.na(Age), Age := 'Overall']
+names(data04)[2:7] <- c('A','B','C','D','E','F')
+
+flextable01 <-
+flextable(data04) %>% 
+  add_header_lines() %>%
+  add_header_row(values = c(" ",rep("Employed",2),rep("Unemployed",2),rep("Inactive",2))) %>%
+  merge_at(i = 1, j = 2:3, part = "header") %>% 
+  merge_at(i = 1, j = 4:5, part = "header") %>% 
+  merge_at(i = 1, j = 6:7, part = "header") %>%
+  set_header_labels(A = paste(trim[7],2021-1,sep = "-"), 
+                    B = paste(trim[7],2021,sep = "-"),
+                    C = paste(trim[7],2021-1,sep = "-"),
+                    D = paste(trim[7],2021,sep = "-"), 
+                    E = paste(trim[7],2021-1,sep = "-"), 
+                    `F` = paste(trim[7],2021,sep = "-")) %>%
+  bold(part = "header") %>%
+  bold(part = "body", j = 1) %>%
+  bg(bg = "#00A297", part = "header", i = 2) %>%
+  bg(bg = "grey95", part = "body", i = c(2,4)) %>%
+  color(color = "white", part = "header", i = 2) %>%
+  fontsize(size = 7, part = "all") %>%
+  align(align = "center", part = "header", i = 1) %>%
+  align(align = "center", part = "header", i = 2, j = 2:7) %>%
+  align(align = "right", part = "body", j = 2:7) %>%
+  colformat_num(j = c(2:7), i = c(1:5),big.mark="," ,digits = 0) %>%
+  border_remove() %>%
+  vline(part = "body", border = fp_border(color="grey85"), j = c(1,3,5)) %>%
+  autofit() %>%
+  width(width = 1.25, j = 1)
+```
+
+#### Number of workers per trimester
+
+```{r, fig.height=5,fig.width=10}
+Plot01 ## This is a ggplot object
+```
+
+The results from trimester JJA-2021 show that:
+
+* There are 8,258,775 workers, **1,066,565 more than JJA-2020** and 109,827 more than MJJ-2021.
+
+* **The unemployment rate is 8.55%, which is 4.38pp. less than one year before.** The participation rate was 56.66%, which is 4.14pp. less than same trimester last year.
+
+* Here you can add more text. You can write something more specific related to the context of the past trimester.
+
+#### Labormarket decomposition
+
+```{r, fig.height=5,fig.width=10}
+flextable01 ## This is a flextable object
+```
+
+You can add more analysis here. The idea is to explain, for each plot and table, some useful information related to the analyzed topic. Too much text in one page is not attractive for the reader, so try to mix text and plots/tables.
+
 
