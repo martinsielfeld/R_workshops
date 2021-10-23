@@ -43,7 +43,7 @@ Plot01 ## This is a ggplot object
 
 The results from trimester `r trim[params$month]`-`r params$year` show that:
 
-* There are `r comma(a)` workers, **`r comma(a-b)` `r ab` than `r trim[params$month]`-`r params$year-1`** and `r comma(a-c)` `r ac` than `r trim[cm]`-`r cy`.
+* There are `r comma(a)` workers, **`r comma(abs(a-b))` `r ab` than `r trim[params$month]`-`r params$year-1`** and `r comma(abs(a-c))` `r ac` than `r trim[cm]`-`r cy`.
 
 * **The unemployment rate is `r percent(d,accuracy = 0.01)`, which is `r percent(abs(d-e),accuracy = 0.01,suffix = 'pp.')` `r de` than one year before.** The participation rate was `r percent(f,accuracy = 0.01)`, which is `r percent(abs(f-g),accuracy = 0.01,suffix = 'pp.')` `r de` than same trimester last year.
 
