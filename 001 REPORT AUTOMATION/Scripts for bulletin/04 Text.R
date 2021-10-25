@@ -8,7 +8,7 @@ b <- data01[date == as.Date(paste0(params$year-1,'-',params$month,'-01'))]$Total
 ab <- ifelse(a > b,'more','less')
 
 ## Last trimester:
-c <- data01[date == as.Date(paste0(params$year,'-',params$month,'-01')) %m+% months(-1)] ## Last trimester
+c <- data01[date == as.Date(paste0(params$year,'-',params$month,'-01')) %m+% months(-1)] 
 cy <- year(c$date)
 cm <- month(c$date)
 c <- c$Total
